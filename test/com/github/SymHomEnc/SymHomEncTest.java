@@ -1,4 +1,4 @@
-package com.SymHomEnc;
+package com.github.SymHomEnc;
 
 import org.junit.Test;
 

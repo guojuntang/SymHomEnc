@@ -1,4 +1,4 @@
-package com.SymHomEnc;
+package com.github.SymHomEnc;
 
 import java.math.BigInteger;
 
