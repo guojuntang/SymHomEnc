@@ -1,4 +1,4 @@
-package com.github.SymHomEnc;
+package com.github.SymHomEnc.Encryption;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;

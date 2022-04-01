@@ -1,22 +1,18 @@
-package com.github.SymHomEnc;
+package com.github.SymHomEnc.Encryption;
 
 import java.math.BigInteger;
 
-public class SHEPrivateKey {
+public class SHEPublicParameter {
     private int k0;
     private int k1;
     private int k2;
     private BigInteger N;
-    private BigInteger p;
-    private BigInteger L;
 
-    public SHEPrivateKey(int k0, int k1, int k2, BigInteger N, BigInteger p, BigInteger L){
+    public SHEPublicParameter(int k0, int k1, int k2, BigInteger N){
         this.k0 = k0;
         this.k1 = k1;
         this.k2 = k2;
         this.N = N;
-        this.p = p;
-        this.L = L;
     }
 
     public int getK0() {
@@ -31,15 +27,7 @@ public class SHEPrivateKey {
         return k2;
     }
 
-    public BigInteger getL() {
-        return L;
-    }
-
     public BigInteger getN() {
         return N;
-    }
-
-    public BigInteger getP() {
-        return p;
     }
 }

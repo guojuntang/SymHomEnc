@@ -1,5 +1,6 @@
-package com.github.SymHomEnc;
+package com.github.SymHomEnc.Encryption;
 
+import com.github.SymHomEnc.Encryption.*;
 import org.junit.Test;
 
 import java.math.BigInteger;
