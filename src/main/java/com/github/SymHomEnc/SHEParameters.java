@@ -5,9 +5,9 @@ import java.security.SecureRandom;
 
 public class SHEParameters {
 	
-	static final int K0 = 1024;
-	static final int K1 = 30;
-	static final int K2 = 80;
+	public static final int K0 = 1024;
+	public static final int K1 = 30;
+	public static final int K2 = 80;
 
 	private static SecureRandom rnd = new SecureRandom();
 
