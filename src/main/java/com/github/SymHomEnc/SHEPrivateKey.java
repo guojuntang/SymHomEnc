@@ -42,4 +42,8 @@ public class SHEPrivateKey {
     public BigInteger getP() {
         return p;
     }
+
+    public SHEPublicParameter getPublicParameter(){
+        return new SHEPublicParameter(k0, k1, k2, N);
+    }
 }

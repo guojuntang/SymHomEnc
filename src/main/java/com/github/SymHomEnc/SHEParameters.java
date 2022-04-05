@@ -63,8 +63,8 @@ public class SHEParameters {
 		BigInteger rp1 = (new BigInteger(k0, rnd));
 		BigInteger rp2 = (new BigInteger(k0, rnd));
 
-		BigInteger E0_1 = (((r1.multiply(L)).add(BigInteger.ZERO)).multiply((BigInteger.ONE).add(rp1.multiply(p)))).mod(N);
-		BigInteger E0_2 = (((r2.multiply(L)).add(BigInteger.ZERO)).multiply((BigInteger.ONE).add(rp2.multiply(p)))).mod(N);
+		SHECipher E0_1 = new SHECipher((((r1.multiply(L)).add(BigInteger.ZERO)).multiply((BigInteger.ONE).add(rp1.multiply(p)))).mod(N));
+		SHECipher E0_2 = new SHECipher((((r2.multiply(L)).add(BigInteger.ZERO)).multiply((BigInteger.ONE).add(rp2.multiply(p)))).mod(N));
 
 		SHEPublicKey pk = new SHEPublicKey(k0, k1, k2,E0_1, E0_2,N);
 

@@ -7,10 +7,10 @@ public class SHEPublicKey {
     private int k1;
     private int k2;
     private BigInteger N;
-    private BigInteger E0_1;
-    private BigInteger E0_2;
+    private SHECipher E0_1;
+    private SHECipher E0_2;
 
-    public SHEPublicKey(int k0, int k1, int k2,BigInteger E0_1, BigInteger E0_2, BigInteger N){
+    public SHEPublicKey(int k0, int k1, int k2,SHECipher E0_1, SHECipher E0_2, BigInteger N){
         this.k0 = k0;
         this.k1 = k1;
         this.k2 = k2;
@@ -19,13 +19,18 @@ public class SHEPublicKey {
         this.N = N;
     }
 
-    public BigInteger getE0_1() {
+    public SHEPublicParameter getPublicParameter(){
+        return new SHEPublicParameter(k0, k1, k2, N);
+    }
+
+    public SHECipher getE0_1() {
         return E0_1;
     }
 
-    public BigInteger getE0_2() {
+    public SHECipher getE0_2() {
         return E0_2;
     }
+
     public int getK0() {
         return k0;
     }

@@ -1,13 +1,17 @@
 package com.github.SymHomEnc;
 
 import com.github.SymHomEnc.*;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.math.BigInteger;
 
 import static org.junit.Assert.*;
 
 public class SymHomEncTest {
+
+
     @Test
     public void paramCheck(){
         SHEParameters param = new SHEParameters(SHEParameters.K0, SHEParameters.K1, SHEParameters.K2);
@@ -34,13 +38,13 @@ public class SymHomEncTest {
         SHEParameters param = new SHEParameters(SHEParameters.K0, SHEParameters.K1, SHEParameters.K2);
         SHEPrivateKey sk = param.getSHEPrivateKey();
 
-        BigInteger a = SymHomEnc.enc(123456, sk);
+        SHECipher a = SymHomEnc.enc(123456, sk);
         BigInteger b = SymHomEnc.dec(a, sk);
 
         assertEquals(b, BigInteger.valueOf(123456));
 
 
-        BigInteger c = SymHomEnc.enc(-4401, sk);
+        SHECipher c = SymHomEnc.enc(-4401, sk);
         BigInteger d = SymHomEnc.dec(c, sk);
 
         assertEquals(d, BigInteger.valueOf(-4401));
@@ -55,15 +59,32 @@ public class SymHomEncTest {
         assertEquals(SymHomEnc.dec(pk.getE0_1(), sk), BigInteger.ZERO);
         assertEquals(SymHomEnc.dec(pk.getE0_2(), sk), BigInteger.ZERO);
 
-        BigInteger a = SymHomEnc.enc(1234456, pk);
+        SHECipher a = SymHomEnc.enc(1234456, pk);
         BigInteger b = SymHomEnc.dec(a, sk);
 
         assertEquals(b, BigInteger.valueOf(1234456));
 
-        BigInteger c = SymHomEnc.enc(-4401, pk);
+        SHECipher c = SymHomEnc.enc(-4401, pk);
         BigInteger d = SymHomEnc.dec(c, sk);
 
         assertEquals(d, BigInteger.valueOf(-4401));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void encExceptionTest(){
+        SHEParameters param = new SHEParameters(SHEParameters.K0, 10, SHEParameters.K2);
+        SHEPrivateKey sk = param.getSHEPrivateKey();
+        SHECipher a = SymHomEnc.enc(100000, sk);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void homoMulExceptionTest(){
+        SHEParameters param = new SHEParameters(SHEParameters.K0, SHEParameters.K1, SHEParameters.K2);
+        SHEPrivateKey sk = param.getSHEPrivateKey();
+        SHEPublicParameter pb = param.getSHEPublicParameter();
+
+        SHECipher a = SymHomEnc.enc(100, sk);
+        SHECipher b = SymHomEnc.hm_mul(a, -10, pb);
     }
 
     @Test
@@ -75,28 +96,28 @@ public class SymHomEncTest {
         SHEPublicKey pk = param.getSHEPublicKey();
 
         // a0 + 3
-        BigInteger a0 = SymHomEnc.enc(12, pk);
-        BigInteger b0 = SymHomEnc.hm_add(a0, 3, pb);
+        SHECipher a0 = SymHomEnc.enc(12, pk);
+        SHECipher b0 = SymHomEnc.hm_add(a0, 3, pb);
         assertEquals(SymHomEnc.dec(b0, sk), BigInteger.valueOf(15));
 
         // a1 + 3
-        BigInteger a1 = SymHomEnc.enc(-12, pk);
-        BigInteger b1 = SymHomEnc.hm_add(a1, 3, pb);
+        SHECipher a1 = SymHomEnc.enc(-12, pk);
+        SHECipher b1 = SymHomEnc.hm_add(a1, 3, pb);
         assertEquals(SymHomEnc.dec(b1, sk), BigInteger.valueOf(-9));
 
         // a1 * a1
-        BigInteger a2 = SymHomEnc.hm_mul(a1, a1, pb);
+        SHECipher a2 = SymHomEnc.hm_mul(a1, a1, pb);
         assertEquals(SymHomEnc.dec(a2, sk), BigInteger.valueOf(144));
 
 
         //-a2 + a0
-        BigInteger a3 = SymHomEnc.enc(-1, sk);
-        BigInteger b2 = SymHomEnc.hm_mul(a2, a3, pb);
-        BigInteger b3 = SymHomEnc.hm_add(b2, a0, pb);
+        SHECipher a3 = SymHomEnc.enc(-1, sk);
+        SHECipher b2 = SymHomEnc.hm_mul(a2, a3, pb);
+        SHECipher b3 = SymHomEnc.hm_add(b2, a0, pb);
         assertEquals(SymHomEnc.dec(b3,sk), BigInteger.valueOf(-132));
 
         // a1 * 100
-        BigInteger b4 = SymHomEnc.hm_mul(a2, 100, pb);
+        SHECipher b4 = SymHomEnc.hm_mul(a2, 100, pb);
         assertEquals(SymHomEnc.dec(b4, sk), BigInteger.valueOf(14400));
 
     }

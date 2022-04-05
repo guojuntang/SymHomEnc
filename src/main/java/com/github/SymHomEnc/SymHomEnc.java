@@ -7,10 +7,9 @@ import java.security.SecureRandom;
 public class SymHomEnc {
 
 	final static SecureRandom rnd = new SecureRandom();
-	private static int k0;
-	private static int k1;
-	private static int k2;
 
+
+	//TODO: define SHE plaintext
 
 	/**
 	 * Encrypt BigInteger with private key
@@ -18,22 +17,11 @@ public class SymHomEnc {
 	 * @param sk
 	 * @return
 	 */
-    public static BigInteger enc(BigInteger val, SHEPrivateKey sk) {
 
-    	int k0 = sk.getK0();
-    	int k1 = sk.getK1();
-    	int k2 = sk.getK2();
-
-    	BigInteger p = sk.getP();
-    	BigInteger L = sk.getL();
-    	BigInteger N = sk.getN();
-
-
-		BigInteger r = new BigInteger(k2, rnd);
-		BigInteger rp = new BigInteger(k0, rnd);
-
-		return (((r.multiply(L)).add(val)).multiply((BigInteger.ONE).add(rp.multiply(p)))).mod(N);
-    }
+	public static SHECipher enc(int val, SHEPrivateKey sk){
+		BigInteger v = BigInteger.valueOf(val);
+		return enc(v, sk);
+	}
 
 	/**
 	 * Encrypt int with private key
@@ -41,10 +29,27 @@ public class SymHomEnc {
 	 * @param sk
 	 * @return
 	 */
-	public static BigInteger enc(int val, SHEPrivateKey sk){
-		BigInteger v = BigInteger.valueOf(val);
-		return enc(v, sk);
-	}
+	public static SHECipher enc(BigInteger val, SHEPrivateKey sk) throws RuntimeException {
+		int k0 = sk.getK0();
+		int k1 = sk.getK1();
+		int k2 = sk.getK2();
+
+		if (val.bitLength() > k1){
+			throw new RuntimeException("SHE plaintext is out of range");
+		}
+
+		BigInteger p = sk.getP();
+		BigInteger L = sk.getL();
+		BigInteger N = sk.getN();
+
+
+		BigInteger r = new BigInteger(k2, rnd);
+		BigInteger rp = new BigInteger(k0, rnd);
+
+		BigInteger result =  (((r.multiply(L)).add(val)).multiply((BigInteger.ONE).add(rp.multiply(p)))).mod(N);
+		return new SHECipher(result);
+    }
+
 
 	/**
 	 * Encrypt int with public key
@@ -52,7 +57,7 @@ public class SymHomEnc {
 	 * @param pk
 	 * @return
 	 */
-	public static BigInteger enc(int val, SHEPublicKey pk){
+	public static SHECipher enc(int val, SHEPublicKey pk){
 		BigInteger v = BigInteger.valueOf(val);
 		return enc(v, pk);
 	}
@@ -64,81 +69,123 @@ public class SymHomEnc {
 	 * @param pk
 	 * @return
 	 */
-	public static BigInteger enc(BigInteger val, SHEPublicKey pk){
+	public static SHECipher enc(BigInteger val, SHEPublicKey pk){
+		try {
+			return enc_helper(val, pk);
+		}catch (Exception e){
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	private static SHECipher enc_helper(BigInteger val, SHEPublicKey pk) throws Exception {
 		int k1 = pk.getK1();
+
+		if (val.bitLength() > k1) {
+			throw new Exception("SHE plaintext is out of range");
+		}
+
 		BigInteger N = pk.getN();
-		BigInteger E0_1 = pk.getE0_1();
-		BigInteger E0_2 = pk.getE0_2();
+		SHECipher E0_1 = pk.getE0_1();
+		SHECipher E0_2 = pk.getE0_2();
 
 
 		BigInteger r1 = new BigInteger(k1, rnd);
 		BigInteger r2 = new BigInteger(k1, rnd);
 
+		SHEPublicParameter pb = pk.getPublicParameter();
+
 		// (val + r1*E0_1 + r2*E0_2) mod N
-        return val.add(r1.multiply(E0_1)).add(r2.multiply(E0_2)).mod(N);
+
+		//BigInteger result = val.add(r1.multiply(E0_1)).add(r2.multiply(E0_2)).mod(N);
+		// return new SHECipher(result);
+        SHECipher v =new SHECipher(val);
+
+		return hm_add(v, hm_add(hm_mul(E0_1, r1,pb),hm_mul(E0_2, r2, pb), pb), pb);
+
 	}
 
+	/**
+	 * Homomorphic add 1
+	 * @param cipher
+	 * @param val
+	 * @param pb
+	 * @return
+	 */
+	public static SHECipher hm_add(SHECipher cipher, SHECipher val, SHEPublicParameter pb){
+	    BigInteger v = val.getCipher();
+	    return hm_add(cipher, v, pb);
+	}
 
-    public static BigInteger hm_add(BigInteger cipher, BigInteger val, SHEPublicParameter pb){
+	/**
+	 * Homomorphic add 2
+	 * @param cipher
+	 * @param val
+	 * @param pb
+	 * @return
+	 */
+    public static SHECipher hm_add(SHECipher cipher, BigInteger val, SHEPublicParameter pb){
 		BigInteger N = pb.getN();
 		// cipher + val mod N
-	    return cipher.add(val).mod(N);
+		BigInteger v = cipher.getCipher().add(val).mod(N);
+		return new SHECipher(v);
 	}
 
-	public static BigInteger hm_add(BigInteger cipher, int val, SHEPublicParameter pb){
+	/**
+	 * Homomorphic add 2
+	 * @param cipher
+	 * @param val
+	 * @param pb
+	 * @return
+	 */
+	public static SHECipher hm_add(SHECipher cipher, int val, SHEPublicParameter pb){
 		BigInteger v = BigInteger.valueOf(val);
 		return hm_add(cipher, v, pb);
 	}
 
-	public static BigInteger hm_mul(BigInteger cipher, BigInteger val, SHEPublicParameter pb){
+
+	/**
+	 * Homomorphic mul 2
+	 * @param cipher
+	 * @param val
+	 * @param pb
+	 * @return
+	 */
+	public static SHECipher hm_mul(SHECipher cipher, BigInteger val, SHEPublicParameter pb) throws RuntimeException{
 		BigInteger N = pb.getN();
+		if(val.compareTo(BigInteger.ZERO) != 1){
+		    throw new RuntimeException("SHE Homomorphic mul: val must be non-negetive");
+		}
 		// cipher * val mod N
-	    return cipher.multiply(val).mod(N);
+	    return new SHECipher(cipher.getCipher().multiply(val).mod(N));
 	}
 
-	public static BigInteger hm_mul(BigInteger cipher, int val, SHEPublicParameter pb){
+	/**
+	 * Homomorphic mul 2
+	 * @param cipher
+	 * @param val
+	 * @param pb
+	 * @return
+	 */
+	public static SHECipher hm_mul(SHECipher cipher, int val, SHEPublicParameter pb){
 		BigInteger v = BigInteger.valueOf(val);
 		return hm_mul(cipher, v, pb);
 	}
 
-    public static BigInteger dec(BigInteger cipher, SHEPrivateKey sk) {
+	public static SHECipher hm_mul(SHECipher cipher, SHECipher val, SHEPublicParameter pb){
+	    BigInteger v = val.getCipher();
+	    return hm_mul(cipher, v, pb);
+	}
+
+    public static BigInteger dec(SHECipher cipher, SHEPrivateKey sk) {
     	BigInteger p = sk.getP();
     	BigInteger L = sk.getL();
 
     	// ((cipher mod p) mod L)
-        BigInteger result = cipher.mod(p).mod(L);
+        BigInteger result = cipher.getCipher().mod(p).mod(L);
     	return (result.compareTo(L.divide(BigInteger.valueOf(2))) == -1)? result: result.subtract(L);
     }
     
     
-    //public static void main(String[] args) {
-	//
-	//	// filtration parameters
-	//
-	//	int filter_k1 = 20;
-	//	int filter_k2 = 80;
-	//	int filter_k0 = 1024;
-	//
-	//	SHSParamters filterParam = SymHomEnc.KeyGen(filter_k0, filter_k1, filter_k2);
-	//
-	//
-	//	BigInteger cipherMinusOne = SymHomEnc.EncInt(-1, filterParam);
-	//
-	//	BigInteger m1 = SymHomEnc.EncInt(1000, filterParam);
-	//	BigInteger m2 = SymHomEnc.EncInt(100, filterParam);
-	//
-	//
-	//
-	//
-	//	BigInteger x = m1.add(m2.multiply(cipherMinusOne));
-	//
-	//	x = x.add(m2.multiply(cipherMinusOne));
-	//
-	//	System.out.println(SymHomEnc.Dec(x, filterParam));
-	//
-    //
-	//}
-        
 
-    
 }
