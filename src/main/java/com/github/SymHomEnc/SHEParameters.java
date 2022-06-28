@@ -2,6 +2,7 @@ package com.github.SymHomEnc;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.Random;
 
 public class SHEParameters {
 	
@@ -9,7 +10,7 @@ public class SHEParameters {
 	public static final int K1 = 30;
 	public static final int K2 = 80;
 
-	private static SecureRandom rnd = new SecureRandom();
+	private Random rnd;
 
 	/**
 	 *  Length of large prime numbers p and q
@@ -34,6 +35,15 @@ public class SHEParameters {
 		this.k0 = k0;
 		this.k1 = k1;
 		this.k2 = k2;
+		this.rnd = new SecureRandom();
+		keyGenHelper();
+	}
+
+	public SHEParameters(int k0, int k1, int k2, Random rnd) {
+		this.k0 = k0;
+		this.k1 = k1;
+		this.k2 = k2;
+		this.rnd = rnd;
 		keyGenHelper();
 	}
 

@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.math.BigInteger;
+import java.util.Random;
 
 import static org.junit.Assert.*;
 
@@ -85,6 +86,40 @@ public class SymHomEncTest {
 
         SHECipher a = SymHomEnc.enc(100, sk);
         SHECipher b = SymHomEnc.hm_mul(a, -10, pb);
+    }
+
+    @Test
+    public void usingRandom(){
+        Random random = new Random();
+        SHEParameters parameters = new SHEParameters(SHEParameters.K0, SHEParameters.K1, SHEParameters.K2, random);
+
+        SHEPublicKey pk = parameters.getSHEPublicKey();
+        SHEPrivateKey sk = parameters.getSHEPrivateKey();
+
+        SHECipher a = SymHomEnc.enc(123456, sk);
+        BigInteger b = SymHomEnc.dec(a, sk);
+
+        assertEquals(b, BigInteger.valueOf(123456));
+
+
+        SHECipher c = SymHomEnc.enc(-4401, sk);
+        BigInteger d = SymHomEnc.dec(c, sk);
+
+        assertEquals(d, BigInteger.valueOf(-4401));
+
+        assertEquals(SymHomEnc.dec(pk.getE0_1(), sk), BigInteger.ZERO);
+        assertEquals(SymHomEnc.dec(pk.getE0_2(), sk), BigInteger.ZERO);
+
+        a = SymHomEnc.enc(1234456, pk);
+        b = SymHomEnc.dec(a, sk);
+
+        assertEquals(b, BigInteger.valueOf(1234456));
+
+        c = SymHomEnc.enc(-4401, pk);
+        d = SymHomEnc.dec(c, sk);
+
+        assertEquals(d, BigInteger.valueOf(-4401));
+
     }
 
     @Test
