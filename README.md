@@ -1,10 +1,9 @@
-Symmetric Homomorphic Encryption
--------------
+# Symmetric Homomorphic Encryption
+
 Symmetric Homomorphic Encryption (SHE) is a Somewhat Homomorphic Encryption that supports both homomorphic addition and homomorphic multiplication.
 
 
-Homomorphic Properties
---------
+## Homomorphic Properties
 
 **Homomorphic Addition-1**: Two ciphertexts E(m1) and E(m2) satisfy E(m1) + E(m2) mod N -> E(m1+m2)
 
@@ -14,12 +13,10 @@ Homomorphic Properties
 
 **Homomorphic Multiplication-2**: A ciphertext E(m1) and a plaintext message m2 > 0 satisfy E(m1) * m2 mod N -> E(m1 * m2)
 
-Maximum Multiplicative Depth
-------
+## Maximum Multiplicative Depth
 SHE can support unlimited rounds of homomorphic addition-1,2, and homomorphic multiplication-2, but it can only provide a limited depth of homomorphic multiplication-1. Usually, we set up the maximum depth as (k0 /k2 - 1), where k0 and k2 are security parameters of the encryption algorithm. The ciphertext will be decrypted incorrectly if it exceeds the maximum depth.
 
-Getting Start
------
+## Getting Start
 
 Temporally, this repo is not available at Maven Central. You can download [package](https://github.com/guojuntang/SymHomEnc/packages/) and add the dependency locally.
 
@@ -35,8 +32,7 @@ Maven example:
 
 ```
 
-Usage
------
+## Usage
 
 ### Initialization
 Set up the SHE security parameters(k0 >> k2 > k1, see the reference for details.) and require the private key, public key, and public parameter.
@@ -101,6 +97,5 @@ Also, you can also use the other Random class as the random number generator.
 ```
 
 
-Reference
------------
+## Reference
 H. Mahdikhani, R. Lu, Y. Zheng, J. Shao and A. A. Ghorbani, "Achieving O(log³n) Communication-Efficient Privacy-Preserving Range Query in Fog-Based IoT," in IEEE Internet of Things Journal, vol. 7, no. 6, pp. 5220-5232, June 2020, doi: 10.1109/JIOT.2020.2977253.
