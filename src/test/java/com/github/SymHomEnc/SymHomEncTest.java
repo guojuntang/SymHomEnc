@@ -96,13 +96,13 @@ public class SymHomEncTest {
         SHEPublicKey pk = parameters.getSHEPublicKey();
         SHEPrivateKey sk = parameters.getSHEPrivateKey();
 
-        SHECipher a = SymHomEnc.enc(123456, sk);
+        SHECipher a = SymHomEnc.enc(123456, sk, random);
         BigInteger b = SymHomEnc.dec(a, sk);
 
         assertEquals(b, BigInteger.valueOf(123456));
 
 
-        SHECipher c = SymHomEnc.enc(-4401, sk);
+        SHECipher c = SymHomEnc.enc(-4401, sk, random);
         BigInteger d = SymHomEnc.dec(c, sk);
 
         assertEquals(d, BigInteger.valueOf(-4401));
@@ -110,12 +110,12 @@ public class SymHomEncTest {
         assertEquals(SymHomEnc.dec(pk.getE0_1(), sk), BigInteger.ZERO);
         assertEquals(SymHomEnc.dec(pk.getE0_2(), sk), BigInteger.ZERO);
 
-        a = SymHomEnc.enc(1234456, pk);
+        a = SymHomEnc.enc(1234456, pk, random);
         b = SymHomEnc.dec(a, sk);
 
         assertEquals(b, BigInteger.valueOf(1234456));
 
-        c = SymHomEnc.enc(-4401, pk);
+        c = SymHomEnc.enc(-4401, pk, random);
         d = SymHomEnc.dec(c, sk);
 
         assertEquals(d, BigInteger.valueOf(-4401));
